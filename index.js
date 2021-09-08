@@ -42,7 +42,12 @@ function calculateMortgagedTime() {
     while(postdepositprice > 0) {
         years++;
         postdepositprice -= salary;
-        postdepositprice = Math.pow(postdepositprice, 1 + (interestrate / 100));
+        postdepositprice = postdepositprice * (1 + (interestrate / 100));
+        if(years > 50) {
+            var resultEl = document.getElementById("mortgaged-result");
+            resultEl.innerText = "Mortgaged purchase: " + 50 + "> years until paid off";
+            break;
+        }
     }
 
     var result = years;
