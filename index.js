@@ -1,56 +1,60 @@
 initListeners();
 
+var savingsAmount;
+var contributionAmount;
+var targetHousePrice;
+var interestRateAmount;
+
+var minDepositValue;
+
 function initListeners() {
     addSubmitListener();
-    priceChangeListener();
 }
 
 function addSubmitListener() {
     $('#submit-btn').click(function() {
-        priceChangeListener();
-        calculateSimpleTime();
-        calculateMortgagedTime();
+        calculateResults();
     });
 }
 
-function priceChangeListener() {
-    $('#targetprice').change(function() {
-        var price = $(this).val();
-        var minDeposit = $('#deposit-result');
-        minDeposit.text("Minimum deposit (20%): $" + ((price / 100) * 20));
-    });
-}
+function calculateResults() {
 
-function calculateSimpleTime() {
-    var savings = document.getElementById("savings").value;
-    var salary = document.getElementById("salary").value;
-    var targetprice = document.getElementById("targetprice").value;
+    var result = document.getElementById("results");
+    result.innerText = "";
 
-    var result = (targetprice-savings) / salary;
-    var resultEl = document.getElementById("simple-result");
-    resultEl.innerText = "Simple purchase: " + result + " years of saving";
-}
+    //Get values
+    savingsAmount = parseFloat(document.getElementById("savings").value);
+    contributionAmount = parseFloat(document.getElementById("contribution").value);
+    targetHousePrice = parseFloat(document.getElementById("targetprice").value);
+    interestRateAmount = parseFloat(document.getElementById("interest-rate").value);
 
-function calculateMortgagedTime() {
-    var savings = document.getElementById("savings").value;
-    var salary = document.getElementById("salary").value;
-    var targetprice = document.getElementById("targetprice").value;
-    var interestrate = document.getElementById("interest-rate").value;
+    //Calculate minimum deposit
+    minDepositValue = (targetHousePrice / 100) * 20;
+    result.innerText += "Minimum deposit (20%): $" + (minDepositValue) + "\n";
 
-    var postdepositprice = targetprice - (savings);
-    var years = 0;
-    while(postdepositprice > 0) {
-        years++;
-        postdepositprice -= salary;
-        postdepositprice = postdepositprice * (1 + (interestrate / 100));
-        if(years > 50) {
-            var resultEl = document.getElementById("mortgaged-result");
-            resultEl.innerText = "Mortgaged purchase: " + 50 + "> years until paid off";
-            break;
-        }
+    //Check minimum deposit
+    if(minDepositValue > savingsAmount) {
+        //Calculate time until deposit achieved
+       var timeTilDeposit = (minDepositValue - savingsAmount) / contributionAmount;
+       result.innerText += "Savings amount is less than minimum deposit. It will take " + timeTilDeposit + " years to save for the deposit.\n";
+       savingsAmount = 1;
     }
 
-    var result = years;
-    var resultEl = document.getElementById("mortgaged-result");
-    resultEl.innerText = "Mortgaged purchase: " + result + " years until paid off";
+    //Check savings sufficient
+    if(savingsAmount >= targetHousePrice) {
+        var difference = savingsAmount - targetHousePrice;
+        result.innerText += "You could buy this house for " + targetHousePrice + " and still have " + difference + " left over.\n";
+    }
+
+    //Calculate time until mortgage paid off
+    var topVal = parseFloat(contributionAmount / (contributionAmount - (savingsAmount * interestRateAmount)));
+    var top = parseFloat(Math.log10(Math.abs(topVal)));
+    var bottomVal = parseFloat(1 + (interestRateAmount / 100));
+    var bottom = parseFloat(Math.log10(Math.abs(bottomVal)));
+    var timeUntilPaidOff = parseFloat(Math.abs(top / bottom));
+
+    alert(top + " " + bottom);
+
+    result.innerText += "Time until paid off: " + timeUntilPaidOff + " years \n";
+
 }
