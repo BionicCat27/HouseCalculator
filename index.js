@@ -23,21 +23,22 @@ function calculateResults() {
     result.innerText = "";
 
     //Get values
-    savingsAmount = parseFloat(document.getElementById("savings").value);
-    contributionAmount = parseFloat(document.getElementById("contribution").value);
-    targetHousePrice = parseFloat(document.getElementById("targetprice").value);
-    interestRateAmount = parseFloat(document.getElementById("interest-rate").value);
+    savingsAmount = Number(document.getElementById("savings").value);
+    contributionAmount = Number(document.getElementById("contribution").value);
+    targetHousePrice = Number(document.getElementById("targetprice").value);
+    interestRateAmount = Number(document.getElementById("interest-rate").value);
 
     //Calculate minimum deposit
     minDepositValue = (targetHousePrice / 100) * 20;
     result.innerText += "Minimum deposit (20%): $" + (minDepositValue) + "\n";
 
     //Check minimum deposit
+    var timeTilDeposit = 0;
     if(minDepositValue > savingsAmount) {
         //Calculate time until deposit achieved
-       var timeTilDeposit = (minDepositValue - savingsAmount) / contributionAmount;
+       timeTilDeposit = (minDepositValue - savingsAmount) / contributionAmount;
        result.innerText += "Savings amount is less than minimum deposit. It will take " + timeTilDeposit + " years to save for the deposit.\n";
-       savingsAmount = 1;
+       savingsAmount += (timeTilDeposit * contributionAmount);
     }
 
     //Check savings sufficient
@@ -53,7 +54,7 @@ function calculateResults() {
     var bottom = parseFloat(Math.log10(Math.abs(bottomVal)));
     var timeUntilPaidOff = parseFloat(Math.abs(top / bottom));
 
-    alert(top + " " + bottom);
+    timeUntilPaidOff += timeTilDeposit;
 
     result.innerText += "Time until paid off: " + timeUntilPaidOff + " years \n";
 
